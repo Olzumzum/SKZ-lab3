@@ -85,7 +85,7 @@ class LabApp(QMainWindow, QDialog, Ui_Dialog):
 
             blur = cv2.GaussianBlur(gray, (21, 21), 0, 0)
             image = cv2.divide(gray, blur, scale=256)
-            self.scaledAndShowedImage(image, self.labImage)
+            self.scaledAndShowedImage(image, self.convmage)
 
     #получить массив байт из pixmap
     def getBytesFromPixmap(self, pixmap):
