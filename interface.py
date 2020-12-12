@@ -16,7 +16,7 @@ class Ui_Dialog(object):
         Dialog.setObjectName("Dialog")
         Dialog.resize(1034, 821)
         self.labImage = QtWidgets.QLabel(Dialog)
-        self.labImage.setGeometry(QtCore.QRect(20, 20, 531, 461))
+        # self.labImage.setGeometry(QtCore.QRect(20, 20, 531, 461))
         self.labImage.setObjectName("labImage")
         self.btnOpen = QtWidgets.QPushButton(Dialog)
         self.btnOpen.setGeometry(QtCore.QRect(30, 500, 93, 28))
