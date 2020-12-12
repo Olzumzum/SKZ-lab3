@@ -1,4 +1,5 @@
 import os
+import datetime
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
@@ -12,11 +13,9 @@ from PIL import Image
 from interface import Ui_Dialog
 
 IMAGE_SIZE = 500
-f = False
+FILE_PATH = ""
 
 class LabApp(QMainWindow, QDialog, Ui_Dialog):
-
-
 
     def __init__(self):
         super().__init__()
@@ -24,14 +23,31 @@ class LabApp(QMainWindow, QDialog, Ui_Dialog):
 
         self.btnOpen.clicked.connect(self.browser_folder)
         self.btnConvert.clicked.connect(self.convertImage)
-        # self.btnSave.clicked.connect(self.save_file)
+        self.btnSave.clicked.connect(self.save_Image)
 
     # открыть файл для обработки
     def browser_folder(self):
-        file_path = self.get_file_path()
-        print(file_path)
+        FILE_PATH = self.get_file_path()
+        print(FILE_PATH)
         # self.load_image(self.labImage, file_path)
-        self.openFile(file_path)
+        self.openFile(FILE_PATH)
+
+    def save_Image(self):
+        save_image =self.convmage
+        if save_image is not None:
+            image = self.getBytesFromPixmap(save_image.pixmap())
+            image2 = self.scaledImage(image)
+
+            date = str(datetime.datetime.now()).replace(":", '')
+            print("save")
+            date = date.replace('-', '')
+            date = date.replace('.', '')
+            date = date.replace(' ', '')
+
+            # file_path = self.
+            file_name = FILE_PATH + date + '.jpg'
+
+            save_image.pixmap().save(file_name, 'jpg', 100)
 
     #получить ссылку на выбранный файл
     def get_file_path(self):
@@ -52,10 +68,9 @@ class LabApp(QMainWindow, QDialog, Ui_Dialog):
         if file_name:
             with open(file_name, "rb") as file:
                 image = self.toNumpyBytes(file.read())
-                self.scaledAndShowedImage(image, self.labImage)
+                self.showedImage(image, self.labImage)
 
-    #масштабировать и отобразить файл
-    def scaledAndShowedImage(self, image, view):
+    def scaledImage(self, image):
         size = image.shape
         step = image.size / size[0]
         qformat = QImage.Format_Indexed8
@@ -68,6 +83,11 @@ class LabApp(QMainWindow, QDialog, Ui_Dialog):
 
         image2 = QImage(image, size[1], size[0], step, qformat)
         image2 = image2.rgbSwapped()
+        return image2
+
+    #масштабировать и отобразить файл
+    def showedImage(self, image, view):
+        image2 = self.scaledImage(image)
 
         pixmap = QPixmap.fromImage(image2)
         pixmap = pixmap.scaled(IMAGE_SIZE, IMAGE_SIZE, QtCore.Qt.KeepAspectRatio)
@@ -79,13 +99,14 @@ class LabApp(QMainWindow, QDialog, Ui_Dialog):
     def convertImage(self):
         if self.labImage is not None:
             data_image = self.getBytesFromPixmap(self.labImage.pixmap())
+
             image = cv2.Canny(data_image, cv2.IMREAD_UNCHANGED, 100, 200)
             gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY) \
                 if len(image.shape) >= 3 else image
 
             blur = cv2.GaussianBlur(gray, (21, 21), 0, 0)
             image = cv2.divide(gray, blur, scale=256)
-            self.scaledAndShowedImage(image, self.convmage)
+            self.showedImage(image, self.convmage)
 
     #получить массив байт из pixmap
     def getBytesFromPixmap(self, pixmap):
@@ -95,7 +116,6 @@ class LabApp(QMainWindow, QDialog, Ui_Dialog):
         ok = pixmap.save(buff, "PNG")
         assert ok
         pixmap_bytes = ba.data()
-        print(type(pixmap_bytes))
         return self.toNumpyBytes(pixmap_bytes)
 
     #преобразовать в массив байт numpy
@@ -104,9 +124,6 @@ class LabApp(QMainWindow, QDialog, Ui_Dialog):
         image = cv2.imdecode(data, cv2.IMREAD_UNCHANGED)
         print(type(image))
         return image
-
-
-
 
 
 
